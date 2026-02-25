@@ -13,8 +13,14 @@ return new class extends Migration
     {
         Schema::table('transaksis', function (Blueprint $table) 
         {
-            if (!Schema::hasColumn ('transaksis', 'kembalian')){
-                $table ->bigInteger ('kembalian')-> nullable ()-> after ('bayar');
+            // 1. Buat kolom 'bayar' terlebih dahulu
+            if (!Schema::hasColumn('transaksis', 'bayar')){
+                $table->bigInteger('bayar')->nullable();
+            }
+
+            // 2. Baru buat kolom 'kembalian' dan letakkan setelah 'bayar'
+            if (!Schema::hasColumn('transaksis', 'kembalian')){
+                $table->bigInteger('kembalian')->nullable()->after('bayar');
             }
         });
     }
@@ -25,7 +31,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('transaksis', function (Blueprint $table) {
-            $table->dropColumn('bayar');
+            // Hapus kedua kolom jika migrasi di-rollback
+            $table->dropColumn(['bayar', 'kembalian']);
         });
     }
 };
